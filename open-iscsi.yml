@@ -1,0 +1,39 @@
+---
+- hosts: iscsi-initiators
+  vars:
+    portal_name: neelixnas.local.lan
+    target_name: iqn.2018-03.lan.local.neelixnas:lan.local.{{ ansible_hostname }}
+
+  tasks:
+  - name: Install iscsi-initiator-utils
+    yum: pkg=iscsi-initiator-utils state=installed update_cache=true
+
+  - name: Setup iscsi initiator name
+    template:
+      src: templates/initiatorname.iscsi.j2
+      dest: /etc/iscsi/initiatorname.iscsi
+      owner: root
+      group: root
+      mode: 'u=rw'
+
+
+  - name: Restart iscsid daemon
+    systemd:
+      name: iscsid
+      daemon_reload: yes
+      state: restarted
+
+
+  - name: Discover iscsi targets
+    open_iscsi:
+      discover: True
+      node_auth: CHAP
+      node_user: username
+      node_pass: password
+      portal: '{{ portal_name }}'
+
+
+  - name: Connect iscsi targets
+    open_iscsi:
+      login: True
+      target: '{{ target_name }}'

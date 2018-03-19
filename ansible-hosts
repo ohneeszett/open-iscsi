@@ -1,0 +1,5 @@
+[iscsi-initiators]
+neelix-cloud-node-0.local.lan
+neelix-cloud-node-1.local.lan
+neelix-cloud-node-2.local.lan
+
